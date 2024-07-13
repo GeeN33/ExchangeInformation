@@ -23,10 +23,9 @@ services:
     expose:
       - "8077"
 
-
   celery_beat:
     build: .
-    container_name: beat_2
+    container_name: beat
     restart: always
     command: celery -A core beat -l INFO
     volumes:
@@ -37,9 +36,22 @@ services:
 
   celery_worker:
     build: .
-    container_name: worker_2
+    container_name: worker
     restart: always
     command: celery -A core worker -l INFO
+    volumes:
+      - .:/usr/src/app/
+    depends_on:
+      - web
+      - redis
+
+  celery_flower:
+    build: .
+    container_name: flower
+    restart: always
+    command: celery -A core flower
+    ports:
+      - 5555:5555
     volumes:
       - .:/usr/src/app/
     depends_on:
@@ -50,7 +62,6 @@ services:
     image: redis:alpine
     restart: always
     container_name: redis
-
 
 volumes:
   static_volume:
