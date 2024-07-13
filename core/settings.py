@@ -139,3 +139,9 @@ CACHES = {
 }
 
 CELERY_CACHE_BACKEND = 'default'
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://api.chillacoin.ru",
+    "https://chillacoin.ru",
+    "http://127.0.0.1:8777",
+    "http://localhost:8777",]
