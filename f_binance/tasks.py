@@ -7,3 +7,7 @@ def task_binance_data():
     res = fetch_binance_data()
 
     return res
+
+
+
+# f_binance.tasks.task_binance_data
