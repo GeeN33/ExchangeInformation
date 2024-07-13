@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8707:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - static_volume:/app/static
+    depends_on:
+      - web
+
+  web:
+    build: .
+    container_name: django_2
+    restart: always
+    command: gunicorn core.wsgi:application --workers 4 --threads 2 --bind 0.0.0.0:8000
+    volumes:
+      - .:/usr/src/app
+      - static_volume:/usr/src/app/static  # Обновим путь к статическим файлам
+    expose:
+      - "8000"
+
+
+#  celery_beat:
+#    build: .
+#    container_name: beat_2
+#    restart: always
+#    command: celery -A core beat -l INFO
+#    volumes:
+#      - .:/usr/src/app/
+#    depends_on:
+#      - web
+#      - redis
+#
+#  celery_worker:
+#    build: .
+#    container_name: worker_2
+#    restart: always
+#    command: celery -A core worker -l INFO
+#    volumes:
+#      - .:/usr/src/app/
+#    depends_on:
+#      - web
+#      - redis
+#
+#  redis:
+#    image: redis:alpine
+#    restart: always
+#    container_name: redis
+#
+
+volumes:
+  static_volume:
