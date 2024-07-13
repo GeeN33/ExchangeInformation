@@ -1,4 +1,4 @@
-FROM python:3.9.12-alpine
+FROM python:3.10-alpine
 
 ENV PYTHONUNBUFFERED 1
 
@@ -11,5 +11,6 @@ RUN pip install --upgrade pip
 COPY ./ .
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
+CMD ["/bin/sh", "-c", "python manage.py migrate"]
 
 

@@ -1,6 +1,7 @@
 import requests
-
-from f_binance.models import Symbol, Filter
+from django.db.models import F
+from datetime import datetime
+from f_binance.models import Symbol, Filter, SymbolsInfo, SymbolError
 
 
 def fetch_binance_data():
@@ -8,41 +9,45 @@ def fetch_binance_data():
     response = requests.get(url)
     exchange_info = response.json()
 
+    info = SymbolsInfo.objects.create()
+    start = datetime.now()
+    count_new = 0
     for symbol_data in exchange_info['symbols']:
-        symbol, created = Symbol.objects.update_or_create(
-            symbol=symbol_data['symbol'],
-            defaults={
-                'pair': symbol_data['pair'],
-                'contract_type': symbol_data['contractType'],
-                'delivery_date': symbol_data['deliveryDate'],
-                'onboard_date': symbol_data['onboardDate'],
-                'status': symbol_data['status'],
-                'maint_margin_percent': symbol_data['maintMarginPercent'],
-                'required_margin_percent': symbol_data['requiredMarginPercent'],
-                'base_asset': symbol_data['baseAsset'],
-                'quote_asset': symbol_data['quoteAsset'],
-                'margin_asset': symbol_data['marginAsset'],
-                'price_precision': symbol_data['pricePrecision'],
-                'quantity_precision': symbol_data['quantityPrecision'],
-                'base_asset_precision': symbol_data['baseAssetPrecision'],
-                'quote_precision': symbol_data['quotePrecision'],
-                'underlying_type': symbol_data.get('underlyingType'),
-                'underlying_sub_type': symbol_data.get('underlyingSubType'),
-                'settle_plan': symbol_data.get('settlePlan'),
-                'trigger_protect': symbol_data.get('triggerProtect'),
-                'liquidation_fee': symbol_data.get('liquidationFee'),
-                'market_take_bound': symbol_data.get('marketTakeBound'),
-                'max_move_order_limit': symbol_data.get('maxMoveOrderLimit'),
-                'order_types': symbol_data['orderTypes'],
-                'time_in_force': symbol_data['timeInForce'],
-            }
-        )
 
-        # Удаляем старые фильтры и добавляем новые
-        symbol.filters.clear()
-        for filter_data in symbol_data['filters']:
-            filter_obj, created = Filter.objects.update_or_create(
-                filter_type=filter_data['filterType'],
-                defaults={k: filter_data.get(k) for k in filter_data if k != 'filterType'}
+        try:
+
+            filters = symbol_data.pop('filters', [])
+
+            symbol, created = Symbol.objects.update_or_create(
+                symbol = symbol_data['symbol'],
+                defaults = symbol_data
             )
-            symbol.filters.add(filter_obj)
+            if created:
+                count_new += 1
+
+            filterTypes_bd_list = list(Filter.objects.filter(symbol = symbol).values_list('filterType', flat=True))
+
+            filterTypes_list = [filter['filterType'] for filter in filters]
+
+            # Delete filters
+            for filter in filterTypes_bd_list:
+                if filter not in filterTypes_list:
+                    Filter.objects.filter(symbol = symbol, filterType = filter).delete()
+
+            # Update or create filters
+            for filter in filters:
+                Filter.objects.update_or_create(
+                    symbol = symbol, filterType = filter['filterType'], defaults = filter)
+
+        except Exception as e:
+            SymbolError.objects.create(
+                symbols_info = info,
+                symbol = symbol_data['symbol'],
+                error = str(e)
+            )
+            print(e)
+    info.count_new = count_new
+    info.time_spent = str(datetime.now() - start)
+    info.save()
+
+    return f'count new: {count_new}, time spent: {str(datetime.now() - start)}, updated: {str(datetime.now())}'

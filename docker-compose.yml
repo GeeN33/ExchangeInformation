@@ -3,8 +3,9 @@ version: '3.8'
 services:
   nginx:
     image: nginx:latest
+    container_name: nginxExchangeInformation
     ports:
-      - "8707:80"
+      - "8777:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - static_volume:/app/static
@@ -13,14 +14,14 @@ services:
 
   web:
     build: .
-    container_name: django_2
+    container_name: djangoExchangeInformation
     restart: always
-    command: gunicorn core.wsgi:application --workers 4 --threads 2 --bind 0.0.0.0:8000
+    command: gunicorn core.wsgi:application --workers 4 --threads 2 --bind 0.0.0.0:8077
     volumes:
       - .:/usr/src/app
       - static_volume:/usr/src/app/static  # Обновим путь к статическим файлам
     expose:
-      - "8000"
+      - "8077"
 
 
 #  celery_beat:

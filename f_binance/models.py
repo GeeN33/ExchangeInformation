@@ -1,42 +1,73 @@
 from django.db import models
 
-class Filter(models.Model):
-    filter_type = models.CharField(max_length=100)
-    min_price = models.CharField(max_length=100, null=True, blank=True)
-    max_price = models.CharField(max_length=100, null=True, blank=True)
-    tick_size = models.CharField(max_length=100, null=True, blank=True)
-    step_size = models.CharField(max_length=100, null=True, blank=True)
-    min_qty = models.CharField(max_length=100, null=True, blank=True)
-    max_qty = models.CharField(max_length=100, null=True, blank=True)
-    limit = models.CharField(max_length=100, null=True, blank=True)
-    notional = models.CharField(max_length=100, null=True, blank=True)
-    multiplier_up = models.CharField(max_length=100, null=True, blank=True)
-    multiplier_down = models.CharField(max_length=100, null=True, blank=True)
-    multiplier_decimal = models.IntegerField(null=True, blank=True)
-
 class Symbol(models.Model):
     symbol = models.CharField(max_length=100, unique=True)
     pair = models.CharField(max_length=100)
-    contract_type = models.CharField(max_length=100)
-    delivery_date = models.BigIntegerField()
-    onboard_date = models.BigIntegerField()
+    contractType = models.CharField(max_length=100)
+    deliveryDate = models.BigIntegerField()
+    onboardDate = models.BigIntegerField()
     status = models.CharField(max_length=100)
-    maint_margin_percent = models.CharField(max_length=100)
-    required_margin_percent = models.CharField(max_length=100)
-    base_asset = models.CharField(max_length=100)
-    quote_asset = models.CharField(max_length=100)
-    margin_asset = models.CharField(max_length=100)
-    price_precision = models.IntegerField()
-    quantity_precision = models.IntegerField()
-    base_asset_precision = models.IntegerField()
-    quote_precision = models.IntegerField()
-    underlying_type = models.CharField(max_length=100, null=True, blank=True)
-    underlying_sub_type = models.JSONField(null=True, blank=True)
-    settle_plan = models.IntegerField(null=True, blank=True)
-    trigger_protect = models.CharField(max_length=100, null=True, blank=True)
-    liquidation_fee = models.CharField(max_length=100, null=True, blank=True)
-    market_take_bound = models.CharField(max_length=100, null=True, blank=True)
-    max_move_order_limit = models.IntegerField(null=True, blank=True)
-    filters = models.ManyToManyField(Filter)
-    order_types = models.JSONField()
-    time_in_force = models.JSONField()
+    maintMarginPercent = models.CharField(max_length=100)
+    requiredMarginPercent = models.CharField(max_length=100)
+    baseAsset = models.CharField(max_length=100)
+    quoteAsset = models.CharField(max_length=100)
+    marginAsset = models.CharField(max_length=100)
+    pricePrecision = models.IntegerField()
+    quantityPrecision = models.IntegerField()
+    baseAssetPrecision = models.IntegerField()
+    quotePrecision = models.IntegerField()
+    underlyingType = models.CharField(max_length=100, null=True, blank=True)
+    underlyingSubType = models.JSONField(null=True, blank=True)
+    settlePlan = models.IntegerField(null=True, blank=True)
+    triggerProtect = models.CharField(max_length=100, null=True, blank=True)
+    liquidationFee = models.CharField(max_length=100, null=True, blank=True)
+    marketTakeBound = models.CharField(max_length=100, null=True, blank=True)
+    maxMoveOrderLimit = models.IntegerField(null=True, blank=True)
+    orderTypes = models.JSONField(null=True, blank=True)
+    timeInForce = models.JSONField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.symbol}'
+
+class Filter(models.Model):
+    symbol = models.ForeignKey(Symbol, on_delete=models.CASCADE, related_name='filters')
+    filterType = models.CharField(max_length=100)
+    maxPrice = models.CharField(max_length=100, null=True, blank=True)
+    minPrice = models.CharField(max_length=100, null=True, blank=True)
+    tickSize = models.CharField(max_length=100, null=True, blank=True)
+    maxQty = models.CharField(max_length=100, null=True, blank=True)
+    minQty = models.CharField(max_length=100, null=True, blank=True)
+    stepSize = models.CharField(max_length=100, null=True, blank=True)
+    limit = models.IntegerField(null=True, blank=True)
+    notional = models.CharField(max_length=100, null=True, blank=True)
+    multiplierUp = models.CharField(max_length=100, null=True, blank=True)
+    multiplierDown = models.CharField(max_length=100, null=True, blank=True)
+    multiplierDecimal = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.filterType}'
+
+class Group(models.Model):
+    symbols = models.ManyToManyField(Symbol)
+    name = models.CharField(max_length=100, null=True, blank=True )
+
+    def __str__(self):
+        return f'{self.name}'
+
+class SymbolsInfo(models.Model):
+    count_new = models.IntegerField(default=0)
+    time_spent = models.CharField(max_length=100, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'time spent:{self.time_spent}, count new:{str(self.count_new)}, updated:{str(self.updated_at)}'
+
+class SymbolError(models.Model):
+    symbols_info = models.ForeignKey(SymbolsInfo, on_delete=models.CASCADE, related_name='symbol_error')
+    symbol = models.CharField(max_length=100, null=True, blank=True)
+    error = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'created:{self.created_at}'
+

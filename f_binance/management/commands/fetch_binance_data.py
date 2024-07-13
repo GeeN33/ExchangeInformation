@@ -7,6 +7,7 @@ class Command(BaseCommand):
     help = 'fetch_binance_data'
 
     def handle(self, *args, **options):
-        fetch_binance_data()
+        res = fetch_binance_data()
+        print(res)
 
 

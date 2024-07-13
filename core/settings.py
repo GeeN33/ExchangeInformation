@@ -1,16 +1,18 @@
 import os
 from pathlib import Path
-
+import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-SECRET_KEY = 'django-insecure-rnmj1blyl9k(a^u9kszsoiws4w^(3!0mbr*6-1t(s+nj9nhu+e'
+SECRET_KEY = env('SECRET_KEY', default='')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG', default=True)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -64,8 +66,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': env('ENGINE', default='BASE_DIR/db.sqlite3'),
+        'NAME': env('NAME', default='sqlite3-local'),
+        'USER': env('USER', default='user-local'),
+        'PASSWORD': env('PASSWORD', default='12345'),
+        'HOST': env('HOST', default='127.0.0.1'),
+        'PORT': env('PORT', default=5432),
     }
 }
 
@@ -117,3 +123,19 @@ STATICFILES_DIRS = [STATIC_DIR]
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REDIS_HOST = env('REDIS_HOST', default='127.0.0.1')
+
+REDIS_PORT = int(env('REDIS_PORT', default=6379))
+
+CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/0"
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': f"redis://{REDIS_HOST}:{REDIS_PORT}/1"
+    }
+}
+
+CELERY_CACHE_BACKEND = 'default'
