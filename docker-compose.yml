@@ -23,45 +23,45 @@ services:
     expose:
       - "8000"
 
-#  celery_beat:
-#    build: .
-#    container_name: beat
-#    restart: always
-#    command: celery -A core beat -l INFO
-#    volumes:
-#      - .:/usr/src/app/
-#    depends_on:
-#      - web
-#      - redis
-#
-#  celery_worker:
-#    build: .
-#    container_name: worker
-#    restart: always
-#    command: celery -A core worker -l INFO
-#    volumes:
-#      - .:/usr/src/app/
-#    depends_on:
-#      - web
-#      - redis
-#
-#  celery_flower:
-#    build: .
-#    container_name: flower
-#    restart: always
-#    command: celery -A core flower
-#    ports:
-#      - 5555:5555
-#    volumes:
-#      - .:/usr/src/app/
-#    depends_on:
-#      - web
-#      - redis
-#
-#  redis:
-#    image: redis:alpine
-#    restart: always
-#    container_name: redis
-#
+  celery_beat:
+    build: .
+    container_name: beat
+    restart: always
+    command: celery -A core beat -l INFO
+    volumes:
+      - .:/usr/src/app/
+    depends_on:
+      - web
+      - redis
+
+  celery_worker:
+    build: .
+    container_name: worker
+    restart: always
+    command: celery -A core worker -l INFO
+    volumes:
+      - .:/usr/src/app/
+    depends_on:
+      - web
+      - redis
+
+  celery_flower:
+    build: .
+    container_name: flower
+    restart: always
+    command: celery -A core flower
+    ports:
+      - 5555:5555
+    volumes:
+      - .:/usr/src/app/
+    depends_on:
+      - web
+      - redis
+
+  redis:
+    image: redis:alpine
+    restart: always
+    container_name: redis
+
 volumes:
   static_volume:
