@@ -23,3 +23,6 @@ class GroupSymbolListView(generics.ListAPIView):
         return Group.objects.prefetch_related(
             Prefetch('symbols', queryset=Symbol.objects.prefetch_related('filters'))
         )
+
+
+# 'https://chillacoin.ru/f-binance/group/3/?format=json'

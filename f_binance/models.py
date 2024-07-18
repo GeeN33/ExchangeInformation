@@ -25,27 +25,28 @@ class Symbol(models.Model):
     maxMoveOrderLimit = models.IntegerField(null=True, blank=True)
     orderTypes = models.JSONField(null=True, blank=True)
     timeInForce = models.JSONField(null=True, blank=True)
+    filters = models.JSONField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.symbol}'
 
-class Filter(models.Model):
-    symbol = models.ForeignKey(Symbol, on_delete=models.CASCADE, related_name='filters')
-    filterType = models.CharField(max_length=100)
-    maxPrice = models.CharField(max_length=100, null=True, blank=True)
-    minPrice = models.CharField(max_length=100, null=True, blank=True)
-    tickSize = models.CharField(max_length=100, null=True, blank=True)
-    maxQty = models.CharField(max_length=100, null=True, blank=True)
-    minQty = models.CharField(max_length=100, null=True, blank=True)
-    stepSize = models.CharField(max_length=100, null=True, blank=True)
-    limit = models.IntegerField(null=True, blank=True)
-    notional = models.CharField(max_length=100, null=True, blank=True)
-    multiplierUp = models.CharField(max_length=100, null=True, blank=True)
-    multiplierDown = models.CharField(max_length=100, null=True, blank=True)
-    multiplierDecimal = models.IntegerField(null=True, blank=True)
-
-    def __str__(self):
-        return f'{self.filterType}'
+# class Filter(models.Model):
+#     symbol = models.ForeignKey(Symbol, on_delete=models.CASCADE, related_name='filters')
+#     filterType = models.CharField(max_length=100)
+#     maxPrice = models.CharField(max_length=100, null=True, blank=True)
+#     minPrice = models.CharField(max_length=100, null=True, blank=True)
+#     tickSize = models.CharField(max_length=100, null=True, blank=True)
+#     maxQty = models.CharField(max_length=100, null=True, blank=True)
+#     minQty = models.CharField(max_length=100, null=True, blank=True)
+#     stepSize = models.CharField(max_length=100, null=True, blank=True)
+#     limit = models.IntegerField(null=True, blank=True)
+#     notional = models.CharField(max_length=100, null=True, blank=True)
+#     multiplierUp = models.CharField(max_length=100, null=True, blank=True)
+#     multiplierDown = models.CharField(max_length=100, null=True, blank=True)
+#     multiplierDecimal = models.IntegerField(null=True, blank=True)
+#
+#     def __str__(self):
+#         return f'{self.filterType}'
 
 class Group(models.Model):
     symbols = models.ManyToManyField(Symbol)

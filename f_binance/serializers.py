@@ -1,18 +1,7 @@
 from rest_framework import serializers
-from .models import Symbol, Filter, Group
-
-
-class FilterSerializer(serializers.ModelSerializer):
-    class Meta:
-       model = Filter
-       fields = '__all__'
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        # Удаляем пустые поля из представления
-        return {key: value for key, value in representation.items() if value is not None}
+from .models import Symbol, Group
 
 class SymbolSerializer(serializers.ModelSerializer):
-    filters = FilterSerializer(many=True, read_only=True)
     class Meta:
        model = Symbol
        fields = '__all__'
