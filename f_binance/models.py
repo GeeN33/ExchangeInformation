@@ -72,3 +72,12 @@ class SymbolError(models.Model):
     def __str__(self):
         return f'created:{self.created_at}'
 
+
+class Log(models.Model):
+    type = models.CharField(max_length=100, default='nunknown')
+    description = models.TextField(default='unknown')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'created:{self.created_at}, type:{self.type}'
+
