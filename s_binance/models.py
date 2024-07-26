@@ -2,30 +2,28 @@ from django.db import models
 
 class Symbol(models.Model):
     symbol = models.CharField(max_length=100, unique=True)
-    pair = models.CharField(max_length=100)
-    contractType = models.CharField(max_length=100)
-    deliveryDate = models.BigIntegerField()
-    onboardDate = models.BigIntegerField()
     status = models.CharField(max_length=100)
-    maintMarginPercent = models.CharField(max_length=100)
-    requiredMarginPercent = models.CharField(max_length=100)
     baseAsset = models.CharField(max_length=100)
-    quoteAsset = models.CharField(max_length=100)
-    marginAsset = models.CharField(max_length=100)
-    pricePrecision = models.IntegerField()
-    quantityPrecision = models.IntegerField()
     baseAssetPrecision = models.IntegerField()
+    quoteAsset = models.CharField(max_length=100)
     quotePrecision = models.IntegerField()
-    underlyingType = models.CharField(max_length=100, null=True, blank=True)
-    underlyingSubType = models.JSONField(null=True, blank=True)
-    settlePlan = models.IntegerField(null=True, blank=True)
-    triggerProtect = models.CharField(max_length=100, null=True, blank=True)
-    liquidationFee = models.CharField(max_length=100, null=True, blank=True)
-    marketTakeBound = models.CharField(max_length=100, null=True, blank=True)
-    maxMoveOrderLimit = models.IntegerField(null=True, blank=True)
-    orderTypes = models.JSONField(null=True, blank=True)
-    timeInForce = models.JSONField(null=True, blank=True)
+    quoteAssetPrecision = models.IntegerField()
+    baseCommissionPrecision = models.IntegerField()  # добавлено
+    quoteCommissionPrecision = models.IntegerField()  # добавлено
+    orderTypes = models.JSONField()
+    icebergAllowed = models.BooleanField()
+    ocoAllowed = models.BooleanField()
+    otoAllowed = models.BooleanField()  # добавлено
+    quoteOrderQtyMarketAllowed = models.BooleanField()
+    allowTrailingStop = models.BooleanField()
+    cancelReplaceAllowed = models.BooleanField()
+    isSpotTradingAllowed = models.BooleanField()
+    isMarginTradingAllowed = models.BooleanField()
     filters = models.JSONField(null=True, blank=True)
+    permissions = models.JSONField(null=True, blank=True)
+    permissionSets = models.JSONField(null=True, blank=True)
+    defaultSelfTradePreventionMode = models.CharField(max_length=100)
+    allowedSelfTradePreventionModes = models.JSONField()
 
     def __str__(self):
         return f'{self.symbol}'
@@ -45,6 +43,7 @@ class Group(models.Model):
     symbols = models.ManyToManyField(Symbol)
     name = models.CharField(max_length=100, null=True, blank=True )
     proxy_active = models.BooleanField(default=False)
+
     def __str__(self):
         return f'{self.pk}-{self.name}'
 
@@ -72,4 +71,5 @@ class Log(models.Model):
 
     def __str__(self):
         return f'created:{self.created_at}, type:{self.type}'
+
 

@@ -12,3 +12,4 @@ admin.site.register(SymbolError)
 admin.site.register(Log)
 
 admin.site.register(Proxy)
+

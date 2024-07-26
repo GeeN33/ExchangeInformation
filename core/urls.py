@@ -8,6 +8,7 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/admin/')),
     path('admin/', admin.site.urls),
     path('f-binance/', include('f_binance.urls')),
+    path('s-binance/', include('s_binance.urls')),
 ]
 
 

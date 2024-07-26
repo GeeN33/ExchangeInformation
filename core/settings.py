@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'f_binance',
+    's_binance'
 ]
 
 MIDDLEWARE = [
