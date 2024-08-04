@@ -36,5 +36,6 @@ class PredictionListView(generics.ListAPIView):
     serializer_class = PredictionSerializer
 
     def get_queryset(self):
-
-        return Prediction.objects.select_related('symbol').all()
+        return Prediction.objects.filter(symbol__isnull=False, predicted_class__isnull=False, probability__isnull=False,
+                                         probabilities__isnull=False, up_date__isnull=False).select_related(
+            'symbol').all()
