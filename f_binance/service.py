@@ -1,7 +1,7 @@
 import requests
 from django.db.models import F
 from datetime import datetime
-from f_binance.models import Symbol, SymbolsInfo, SymbolError
+from f_binance.models import Symbol, SymbolsInfo, SymbolError, Prediction
 
 
 def fetch_binance_data():
@@ -20,6 +20,7 @@ def fetch_binance_data():
                 defaults = symbol_data
             )
             if created:
+                Prediction.objects.create(symbol=symbol)
                 count_new += 1
 
         except Exception as e:

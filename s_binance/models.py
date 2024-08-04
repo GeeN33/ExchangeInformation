@@ -73,3 +73,10 @@ class Log(models.Model):
         return f'created:{self.created_at}, type:{self.type}'
 
 
+class Prediction(models.Model):
+    symbol = models.ForeignKey(Symbol, on_delete=models.CASCADE, related_name='prediction')
+    predicted_class = models.CharField(max_length=10, null=True, blank=True)
+    probability = models.FloatField(null=True, blank=True)
+    probabilities = models.JSONField(null=True, blank=True)
+    up_date = models.DateTimeField(null=True, blank=True)
+

@@ -1,7 +1,8 @@
 import requests
 from django.db.models import F
 from datetime import datetime
-from s_binance.models import Symbol, SymbolsInfo, SymbolError
+from s_binance.models import Symbol, SymbolsInfo, SymbolError, Prediction
+
 
 def fetch_binance_data():
     # fetch_binance_data_spot
@@ -9,17 +10,20 @@ def fetch_binance_data():
     response = requests.get(url)
     exchange_info = response.json()
 
+    symbolException=['USDPUSDT','TUSDUSDT','BUSDUSDT','USDCUSDT']
+
     info = SymbolsInfo.objects.create()
     start = datetime.now()
     count_new = 0
     for symbol_data in exchange_info['symbols']:
-        if(symbol_data['quoteAsset'] == 'USDT'):
+        if(symbol_data['quoteAsset'] == 'USDT' and symbol_data['symbol'] not in symbolException):
             try:
                 symbol, created = Symbol.objects.update_or_create(
                     symbol = symbol_data['symbol'],
                     defaults = symbol_data
                 )
                 if created:
+                    Prediction.objects.create(symbol=symbol)
                     count_new += 1
 
             except Exception as e:

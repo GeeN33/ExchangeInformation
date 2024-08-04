@@ -1,10 +1,10 @@
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Max
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Group, Symbol, Log
-from .serializers import GroupSerializer, SymbolSerializer
+from .models import Group, Symbol, Log, Prediction
+from .serializers import GroupSerializer, SymbolSerializer, PredictionSerializer
 
 
 class GroupSymbolDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -31,3 +31,13 @@ class UpdateLogView(APIView):
             Log.objects.create(type=type, description=description)
         return Response({"status": "ok"}, status=status.HTTP_200_OK)
 
+
+class PredictionListView(generics.ListAPIView):
+    serializer_class = PredictionSerializer
+
+    def get_queryset(self):
+        predictions = Prediction.objects.all()
+
+        max_up_date = predictions.aggregate(Max('up_date'))['up_date__max']
+
+        return predictions.filter(up_date=max_up_date)

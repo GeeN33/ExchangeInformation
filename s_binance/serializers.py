@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Symbol, Group, Proxy
+from .models import Symbol, Group, Proxy, Prediction
 
 
 class ProxySerializer(serializers.ModelSerializer):
@@ -19,3 +19,8 @@ class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = '__all__'
+
+class PredictionSerializer(serializers.ModelSerializer):
+    class Meta:
+       model = Prediction
+       fields = '__all__'
