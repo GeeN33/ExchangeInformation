@@ -34,11 +34,7 @@ class PredictionListView(generics.ListAPIView):
 
     def get_queryset(self):
 
-        predictions = Prediction.objects.all()
-
-        max_up_date = predictions.aggregate(Max('up_date'))['up_date__max']
-
-        return predictions.filter(up_date=max_up_date)
+        return Prediction.objects.select_related('symbol').all()
 
 
 class UpdateLogView(APIView):
@@ -51,3 +47,5 @@ class UpdateLogView(APIView):
         return Response({"status": "ok"}, status=status.HTTP_200_OK)
 
 # 'https://chillacoin.ru/f-binance/group/3/?format=json'
+
+# 'https://chillacoin.ru/f-binance/prediction/?format=json'

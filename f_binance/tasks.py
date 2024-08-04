@@ -23,4 +23,4 @@ def task_go_prediction_60():
     return res
 
 
-# f_binance.tasks.task_binance_data
+# f_binance.tasks.task_go_prediction_5

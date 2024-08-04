@@ -21,7 +21,17 @@ class GroupSerializer(serializers.ModelSerializer):
 
 
 
+
 class PredictionSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
     class Meta:
        model = Prediction
-       fields = '__all__'
+       fields = ('name', 'predicted_class', 'probability', 'probabilities', 'up_date')
+
+    def get_name(self, obj):
+        return obj.symbol.symbol
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['name'] = self.get_name(instance)
+        return ret

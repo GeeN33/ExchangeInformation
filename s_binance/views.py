@@ -36,8 +36,5 @@ class PredictionListView(generics.ListAPIView):
     serializer_class = PredictionSerializer
 
     def get_queryset(self):
-        predictions = Prediction.objects.all()
 
-        max_up_date = predictions.aggregate(Max('up_date'))['up_date__max']
-
-        return predictions.filter(up_date=max_up_date)
+        return Prediction.objects.select_related('symbol').all()
