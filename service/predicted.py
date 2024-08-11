@@ -6,6 +6,7 @@ from dateutil import parser
 
 from f_binance.models import Prediction as PredictionF
 from s_binance.models import Prediction as PredictionS
+from service.telegram import send_mass_tg
 
 API_URL="http://147.45.228.133:8444/predict/"
 
@@ -146,6 +147,8 @@ def go_prediction(per):
     date = datetime.datetime.now()
     current_date = timezone.now()
     predictions = prediction(False, per)
+    predicted_class1 = 0
+    predicted_class2 = 0
     for predict in predictions:
         coin = PredictionF.objects.filter(symbol__symbol=predict['symbol']).last()
         if coin:
@@ -153,6 +156,11 @@ def go_prediction(per):
             coin.probability = predict['probability']
             coin.probabilities = predict['probabilities']
             coin.up_date = current_date
+            if coin.probability > 90 and (coin.predicted_class == '1' or coin.predicted_class == '4'):
+                predicted_class1 += 1
+            if coin.probability > 90 and (coin.predicted_class == '2' or coin.predicted_class == '5'):
+                predicted_class2 += 1
+                #  send_mass_tg(current_date, coin.symbol, coin.predicted_class, coin.probability,False)
             coin.save()
 
     predictions = prediction(True, per)
@@ -163,6 +171,10 @@ def go_prediction(per):
             coin.probability = predict['probability']
             coin.probabilities = predict['probabilities']
             coin.up_date = current_date
+            if coin.probability > 90 and (coin.predicted_class == '1' or coin.predicted_class == '4'):
+                predicted_class1 += 1
+            if coin.probability > 90 and (coin.predicted_class == '2' or coin.predicted_class == '5'):
+                predicted_class2 += 1
             coin.save()
 
-    return f'predictions finish {datetime.datetime.now() - date}'
+    return f'predictions finish {datetime.datetime.now() - date} predicted_class1:{predicted_class1} predicted_class2:{predicted_class2}'
