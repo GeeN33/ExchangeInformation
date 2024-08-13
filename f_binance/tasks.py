@@ -1,5 +1,6 @@
 from celery import shared_task
 
+from core.celery import app
 from f_binance.service import fetch_binance_data
 from service.predicted import go_prediction
 
@@ -22,5 +23,10 @@ def task_go_prediction_60():
 
     return res
 
+@app.task
+def task_go_prediction_5_new():
+    res = go_prediction('5')
+
+    return res
 
 # f_binance.tasks.task_go_prediction_5

@@ -7,8 +7,7 @@ from dateutil import parser
 from f_binance.models import Prediction as PredictionF
 from s_binance.models import Prediction as PredictionS
 from service.telegram import send_mass_tg
-
-API_URL="http://147.45.228.133:8444/predict/"
+from core.settings import IA_URL
 
 
 def max_min_bars(bars):
@@ -113,7 +112,8 @@ def sort_bars(bars):
     return  barss
 
 def get_coin_delta(isspot, per):
-    symbols_data = sort_symbols_coin(True, per)
+
+    symbols_data = sort_symbols_coin(isspot, per)
     symbols = []
     bars = []
     for data in symbols_data:
@@ -136,7 +136,7 @@ def prediction(isspot, per):
         "symbols": symbols
     }, indent=False)
 
-    response = requests.request("POST", API_URL, headers=headers, data=payload, verify=False)
+    response = requests.request("POST", IA_URL, headers=headers, data=payload)
 
     if response.status_code == 200:
         return response.json()['predictions']
@@ -147,6 +147,7 @@ def go_prediction(per):
     date = datetime.datetime.now()
     current_date = timezone.now()
     predictions = prediction(False, per)
+    F_count = len(predictions)
     predicted_class1 = 0
     predicted_class2 = 0
     for predict in predictions:
@@ -164,6 +165,7 @@ def go_prediction(per):
             coin.save()
 
     predictions = prediction(True, per)
+    S_count = len(predictions)
     for predict in predictions:
         coin = PredictionS.objects.filter(symbol__symbol=predict['symbol']).last()
         if coin:
@@ -177,4 +179,4 @@ def go_prediction(per):
                 predicted_class2 += 1
             coin.save()
 
-    return f'predictions finish {datetime.datetime.now() - date} predicted_class1:{predicted_class1} predicted_class2:{predicted_class2}'
+    return f'predictions finish {datetime.datetime.now() - date} predictions F count:{F_count} S count:{S_count}, predicted_class1:{predicted_class1}, predicted_class2:{predicted_class2}'
