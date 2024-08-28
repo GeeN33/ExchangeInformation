@@ -18,7 +18,6 @@ DEBUG = env('DEBUG', default=True)
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -32,7 +31,8 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'f_binance',
-    's_binance'
+    's_binance',
+    's_mexc',
 ]
 
 MIDDLEWARE = [
@@ -44,6 +44,14 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if DEBUG:
+    import debug_toolbar
+    INSTALLED_APPS += ['debug_toolbar']
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+    INTERNAL_IPS = [
+        "127.0.0.1",
+    ]
 
 ROOT_URLCONF = 'core.urls'
 

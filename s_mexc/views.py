@@ -3,7 +3,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Group, Symbol, Log, Prediction
+from .models import Group, Symbol, Log, Prediction, SubGroup
 from .serializers import GroupSerializer, SymbolSerializer, PredictionSerializer
 
 
@@ -11,7 +11,14 @@ class GroupSymbolDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = GroupSerializer
 
     def get_queryset(self):
-        return Group.objects.select_related('proxy').prefetch_related('symbols')
+        return Group.objects.select_related('proxy').prefetch_related(
+
+            Prefetch('subgroup', queryset=SubGroup.objects.prefetch_related(
+
+                Prefetch('symbols', queryset=Symbol.objects.only('symbol', 'status')),
+
+            ).all()),
+        )
 
 class SymbolDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Symbol.objects.all()
@@ -20,7 +27,14 @@ class GroupSymbolListView(generics.ListAPIView):
     serializer_class = GroupSerializer
 
     def get_queryset(self):
-        return Group.objects.select_related('proxy').prefetch_related('symbols')
+        return Group.objects.select_related('proxy').prefetch_related(
+
+            Prefetch('subgroup', queryset=SubGroup.objects.prefetch_related(
+
+                Prefetch('symbols', queryset=Symbol.objects.only('symbol', 'status')),
+
+            ).all()),
+        )
 
 class UpdateLogView(APIView):
 
@@ -31,7 +45,6 @@ class UpdateLogView(APIView):
             Log.objects.create(type=type, description=description)
         return Response({"status": "ok"}, status=status.HTTP_200_OK)
 
-
 class PredictionListView(generics.ListAPIView):
     serializer_class = PredictionSerializer
 
@@ -39,3 +52,4 @@ class PredictionListView(generics.ListAPIView):
         return Prediction.objects.filter(symbol__isnull=False, predicted_class__isnull=False, probability__isnull=False,
                                          probabilities__isnull=False, up_date__isnull=False).select_related(
             'symbol')
+

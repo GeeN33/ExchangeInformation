@@ -18,23 +18,23 @@ class SymbolDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SymbolSerializer
 
 class GroupSymbolDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Group.objects.all()
     serializer_class = GroupSerializer
+
+    def get_queryset(self):
+        return Group.objects.select_related('proxy').prefetch_related('symbols')
 
 class GroupSymbolListView(generics.ListAPIView):
     serializer_class = GroupSerializer
 
     def get_queryset(self):
-        return Group.objects.prefetch_related(
-            Prefetch('symbols', queryset=Symbol.objects.prefetch_related('filters'))
-        )
+        return Group.objects.select_related('proxy').prefetch_related('symbols')
 
 class PredictionListView(generics.ListAPIView):
     serializer_class = PredictionSerializer
 
     def get_queryset(self):
 
-        return Prediction.objects.filter(symbol__isnull=False, predicted_class__isnull=False, probability__isnull=False, probabilities__isnull=False, up_date__isnull=False).select_related('symbol').all()
+        return Prediction.objects.filter(symbol__isnull=False, predicted_class__isnull=False, probability__isnull=False, probabilities__isnull=False, up_date__isnull=False).select_related('symbol')
 
 
 class UpdateLogView(APIView):
