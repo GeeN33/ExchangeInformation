@@ -1,9 +1,9 @@
 import requests
 
-from core.settings import TG_KEY, MY_TG_KEY
+from core.settings import TG_KEY, MY_TG_ID
 
 bot_token = TG_KEY
-my_bot_token = MY_TG_KEY
+my_chat_id = MY_TG_ID
 
 def send_mass_tg(text):
 
@@ -12,7 +12,7 @@ def send_mass_tg(text):
     url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
 
     chats = []
-    chats.append(my_bot_token)
+    chats.append(my_chat_id)
 
     for chat in chats:
         params = {
