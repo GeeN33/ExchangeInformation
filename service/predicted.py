@@ -144,6 +144,7 @@ def prediction(isspot, per):
         return []
 
 def go_prediction(per):
+    text_for_tg = ''
     date = datetime.datetime.now()
     current_date = timezone.now()
     predictions = prediction(False, per)
@@ -159,9 +160,9 @@ def go_prediction(per):
             coin.up_date = current_date
             if coin.probability > 90 and (coin.predicted_class == '1' or coin.predicted_class == '4'):
                 predicted_class1 += 1
+                text_for_tg += f'{coin.symbol} - {coin.probability} \n'
             if coin.probability > 90 and (coin.predicted_class == '2' or coin.predicted_class == '5'):
                 predicted_class2 += 1
-                #  send_mass_tg(current_date, coin.symbol, coin.predicted_class, coin.probability,False)
             coin.save()
 
     predictions = prediction(True, per)
@@ -175,8 +176,11 @@ def go_prediction(per):
             coin.up_date = current_date
             if coin.probability > 90 and (coin.predicted_class == '1' or coin.predicted_class == '4'):
                 predicted_class1 += 1
+                text_for_tg += f'{coin.symbol} - {coin.probability} \n'
             if coin.probability > 90 and (coin.predicted_class == '2' or coin.predicted_class == '5'):
                 predicted_class2 += 1
             coin.save()
+    if  predicted_class1 > 0:
+        send_mass_tg(text_for_tg)
 
     return f'predictions finish {datetime.datetime.now() - date} predictions F count:{F_count} S count:{S_count}, predicted_class1:{predicted_class1}, predicted_class2:{predicted_class2}'

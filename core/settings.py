@@ -11,6 +11,8 @@ SECRET_KEY = env('SECRET_KEY', default='')
 
 TG_KEY=env('TG_KEY', default='')
 
+MY_TG_KEY = env('MY_TG_KEY', default='')
+
 IA_URL=env('IA_URL', default='http://127.0.0.1:8444/predict/')
 
 # SECURITY WARNING: don't run with debug turned on in production!

@@ -3,7 +3,14 @@ from celery import shared_task
 from core.celery import app
 from f_binance.service import fetch_binance_data
 from service.predicted import go_prediction
+from service.telegram import send_mass_tg
 
+
+@shared_task
+def task_tg_test():
+    send_mass_tg('test ok')
+
+    return 'ok'
 
 @shared_task
 def task_binance_data():
